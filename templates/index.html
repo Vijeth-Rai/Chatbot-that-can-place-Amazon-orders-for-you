@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Assistant Chatbot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        #chat-container {
+            width: 60%;
+            max-width: 800px;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            margin-top: 20px;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+        #message-form {
+            display: flex;
+            width: 100%;
+            margin-top: 20px;
+        }
+        #user-message {
+            flex-grow: 1;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+        #send-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            background-color: #007BFF;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .message {
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .user-message {
+            background-color: #007BFF;
+            color: white;
+            text-align: right;
+        }
+        .bot-message {
+            background-color: #eee;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div id="chat-container"></div>
+    <form id="message-form">
+        <input type="text" id="user-message" placeholder="Type your message here" required>
+        <button type="submit" id="send-button">Send</button>
+    </form>
+    <script>
+        const chatContainer = document.getElementById('chat-container');
+        const messageForm = document.getElementById('message-form');
+        const userMessageInput = document.getElementById('user-message');
+
+        messageForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const userMessage = userMessageInput.value.trim();
+            if (userMessage) {
+                appendMessage('user', userMessage);
+                userMessageInput.value = '';
+                const botResponse = await sendMessage(userMessage);
+                appendMessage('bot', botResponse);
+            }
+        });
+
+        async function sendMessage(message) {
+            const response = await fetch('/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message }),
+            });
+            const data = await response.json();
+            return data.response;
+        }
+
+        function appendMessage(sender, message) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', `${sender}-message`);
+            messageElement.innerHTML = message;  // Use innerHTML to render HTML tags
+            chatContainer.appendChild(messageElement);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+    </script>
+</body>
+</html>
